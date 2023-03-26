@@ -1,0 +1,37 @@
+import cv2
+import mediapipe as mp
+from mediapipe.python.solutions import drawing_utils as mp_drawing
+
+
+# initialize mediapipe pose detection
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
+# read video file
+cap = cv2.VideoCapture('test/example1.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+
+    # check if frame is read successfully
+    if not ret:
+        break
+
+    # convert image to RGB and process pose estimation
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = pose.process(frame)
+
+    # draw pose landmarks on image
+    if results.pose_landmarks:
+        mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+
+    # display the resulting image
+    cv2.imshow('Pose Estimation', frame)
+
+    # exit loop on 'q' key press
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# release resources
+cap.release()
+cv2.destroyAllWindows()
